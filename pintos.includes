@@ -1,0 +1,15 @@
+specs/kbd
+src/devices
+src/filesys
+src/lib
+src/lib/kernel
+src/lib/user
+src/tests
+src/tests/filesys
+src/tests/filesys/base
+src/tests/filesys/extended
+src/tests/threads
+src/tests/userprog
+src/tests/vm
+src/threads
+src/userprog
