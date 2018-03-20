@@ -104,7 +104,12 @@ timer_sleep (int64_t ticks)
     thread_yield ();
   */
 
+  //add interrupt lock
+  ASSERT (intr_get_level () == INTR_ON);
+  enum intr_level old_level = intr_disable ();
+
   int64_t start = timer_ticks ();
+
 
   //compute wakeup time for current thread
   struct thread *CurThread;
@@ -116,6 +121,9 @@ timer_sleep (int64_t ticks)
 
   //block current thread
   thread_block();
+
+  //release interrupt lock
+  intr_set_level (old_level);
 
 }
 
@@ -196,8 +204,8 @@ timer_interrupt (struct intr_frame *args UNUSED)
   ticks++;
   thread_tick ();
 
-  struct list_elem *e = list_front(&SleepList);
-  struct thread *t = list_entry(e, struct thread, elem);
+  struct list_elem *e;
+  struct thread *t;
 
   while(!list_empty(&SleepList)){
 
@@ -206,13 +214,15 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
     if (t->WakeupTime > ticks){
 
+        list_remove(e);
+        thread_unblock(t);
+
 	break;
     }
 
-  }
 
-  list_remove(e);
-  thread_unblock(t);
+
+  }
 
 
 
