@@ -213,13 +213,11 @@ timer_interrupt (struct intr_frame *args UNUSED)
     t = list_entry(e, struct thread, elem);
 
     if (t->WakeupTime > ticks){
-
-        list_remove(e);
-        thread_unblock(t);
-
 	break;
     }
 
+    list_remove(e);
+    thread_unblock(t);
 
 
   }
