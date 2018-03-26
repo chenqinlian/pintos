@@ -87,7 +87,9 @@ struct thread
     enum thread_status status;          /* Thread state. */
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
-    int priority;                       /* Priority. */
+    int priority;                       /* Priority, may be updated later */
+    int InitialPriority;		/* Priority given at the beginning*/
+
     struct list_elem allelem;           /* List element for all threads list. */
 
     int64_t WakeupTime;			/* wakeup time*/
@@ -143,5 +145,7 @@ int thread_get_load_avg (void);
 /* Comparator of two threads' wakeup time when being ordered in a list*/
 bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
 
+/* Comparator of two threads' priority when being ordered in a list*/
+bool thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
 
 #endif /* threads/thread.h */
