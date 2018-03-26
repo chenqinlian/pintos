@@ -589,7 +589,7 @@ uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 /* Comparator of two threads' wakeup time when being ordered in a list
 bool*/
 bool
-thread_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux){
+thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux){
 
   struct thread *t1 = list_entry(e1, struct thread, elem);
   struct thread *t2 = list_entry(e2, struct thread, elem);

@@ -117,7 +117,7 @@ timer_sleep (int64_t ticks)
   CurThread->WakeupTime = start + ticks;
   
   //insert current thread to sleep list
-  list_insert_ordered(&SleepList, &CurThread->elem, thread_comparator, NULL);
+  list_insert_ordered(&SleepList, &CurThread->elem, thread_wakeuptime_comparator, NULL);
 
   //block current thread
   thread_block();

@@ -141,7 +141,7 @@ int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
 /* Comparator of two threads' wakeup time when being ordered in a list*/
-bool thread_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
+bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
 
 
 #endif /* threads/thread.h */
