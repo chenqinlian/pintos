@@ -589,6 +589,22 @@ allocate_tid (void)
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
 
+/* check whether there exist priority donation when a thread is waiting on a lock*/
+void check_priority_donation(struct thread *t, struct lock *lock){
+
+
+}
+
+
+/* update thread attributes when a thread hold a new lock*/
+void thread_update_new_lock(struct thread *t, struct lock *lock){
+
+
+}
+
+
+
+
 /* Comparator of two threads' wakeup time when being ordered in a list
 bool*/
 bool

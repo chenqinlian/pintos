@@ -4,6 +4,7 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+#include "synch.h"
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -23,6 +24,8 @@ typedef int tid_t;
 #define PRI_MIN 0                       /* Lowest priority. */
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
+#define PRI_DONATION_MAX_DEPTH 8        /* Highest priority. */
+
 
 /* A kernel thread or user process.
 
@@ -141,6 +144,14 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+
+/* check whether there exist priority donation when a thread is waiting on a lock*/
+void check_priority_donation(struct thread *t, struct lock *lock);
+
+/* update thread attributes when a thread hold a new lock*/
+void thread_update_new_lock(struct thread *t, struct lock *lock);
+
+
 
 /* Comparator of two threads' wakeup time when being ordered in a list*/
 bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
