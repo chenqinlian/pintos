@@ -470,6 +470,13 @@ init_thread (struct thread *t, const char *name, int priority)
   old_level = intr_disable ();
   list_push_back (&all_list, &t->allelem);
   intr_set_level (old_level);
+
+  /* Set up Locks held/ lock is waiting on / initial priority for task1.2*/
+  t->InitialPriority = priority;
+  t->LockWaitOn = NULL;
+  list_init(&t->locks);
+
+
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and

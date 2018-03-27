@@ -95,6 +95,10 @@ struct thread
 
     struct list_elem allelem;           /* List element for all threads list. */
 
+    struct list locks;			/*Task1.2, list of locks held by current thread*/
+    struct lock *LockWaitOn;   		/*Task1.2, The lock current thread is waiting on*/
+
+
     int64_t WakeupTime;			/* wakeup time*/
 
     /* Shared between thread.c and synch.c. */
