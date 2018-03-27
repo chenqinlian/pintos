@@ -678,6 +678,26 @@ void thread_update_new_lock(struct thread *t, struct lock *lock){
 
 }
 
+/* check the change of current thread's priority to see if preemption is necessary*/
+void thread_check_preemption(struct thread *t, struct lock *lock){
+
+  enum intr_level old_level = intr_disable ();
+
+  if(!list_empty (&ready_list)){
+    
+    struct thread *t_max = list_entry (list_front (&ready_list), struct thread, elem); 
+    struct thread *t_cur = thread_current();
+    
+    if(t_max->priority> t_cur->priority){
+      thread_yield();
+    }
+
+
+  }
+
+
+  intr_set_level (old_level);  
+}
 
 
 
