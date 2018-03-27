@@ -200,6 +200,8 @@ lock_acquire (struct lock *lock)
 
 
   struct thread *t = thread_current();
+
+  /*update priority of both lock waiting on/ his holder if possible*/
   check_priority_donation(t, lock);
 
 
@@ -207,6 +209,8 @@ lock_acquire (struct lock *lock)
 
 
   t = thread_current();
+
+  /*Add lock to current threads' lock list*/
   thread_update_new_lock(t, lock);
 
   /*

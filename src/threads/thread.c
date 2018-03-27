@@ -600,12 +600,81 @@ uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 void check_priority_donation(struct thread *t, struct lock *lock){
 
 
+  enum intr_level old_level = intr_disable ();
+
+  int Depth = 0;
+  struct lock *l_temp;
+  struct thread *t_temp;
+  struct thread *l_holder; 
+
+  l_temp = lock;
+  t_temp = t;
+  l_holder = lock->holder;
+
+
+  while(!l_temp && Depth<PRI_DONATION_MAX_DEPTH && l_temp->MaxPriority < t_temp->priority ){
+
+    /*current thread t_temp donate priority to l_temp, the lock he is waiting on*/
+        
+    l_temp->MaxPriority = t_temp->priority;
+
+
+    /*l_temp send the priority given(last step) to his holder, holder thread choose the best guy from his lock list, then update holder's priority*/
+
+    if(!list_empty(&l_holder->locks)){
+
+        struct lock *locklist_max = list_entry(list_max (&l_holder->locks, lock_priority_comparator, NULL),struct thread, elem);
+    
+        int old = l_holder->InitialPriority;
+        int new = locklist_max->MaxPriority;
+
+        l_holder->priority = new> old ? new:old;
+
+    }
+    else{
+        l_holder->priority = l_holder->InitialPriority;
+    }    
+
+
+    /*update holder's priority in ready list from scheduler, check whether preemption is necessary*/
+
+    if(l_holder->status = THREAD_READY){
+        list_remove (&l_holder->elem);
+        list_insert_ordered (&ready_list, &l_holder->elem,thread_priority_comparator, NULL);
+    }    
+
+    
+    /*recursive formula*/
+    t_temp = l_holder;
+    l_temp = l_holder->LockWaitOn;
+    l_holder=l_temp->holder;
+
+
+    Depth++;	
+  }
+
+  intr_set_level (old_level);
+
 }
 
 
 /* update thread attributes when a thread hold a new lock*/
 void thread_update_new_lock(struct thread *t, struct lock *lock){
 
+  /*This functionn need rename later. lock priority is updated first. lock is added to t->locks later*/
+
+  enum intr_level old_level = intr_disable ();
+
+  /*lock priority is updated*/
+  lock->holder = t;
+  lock->MaxPriority = t->priority;
+  
+  t->LockWaitOn = NULL;
+
+  /*lock is added to t->locks*/
+  list_insert_ordered(&t->locks, &lock->elem, lock_priority_comparator, NULL);
+
+  intr_set_level (old_level);
 
 }
 
