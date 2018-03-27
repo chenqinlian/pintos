@@ -259,6 +259,18 @@ lock_held_by_current_thread (const struct lock *lock)
 
   return lock->holder == thread_current ();
 }
+
+/* Comparator of two locks' priority when being ordered in a thread->locks*/
+bool
+lock_priority_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux){
+
+  struct lock *l1 = list_entry(e1, struct lock, elem);
+  struct lock *l2 = list_entry(e2, struct lock, elem);
+
+  return l1->MaxPriority> l2->MaxPriority;
+}
+
+
 
 /* One semaphore in a list. */
 struct semaphore_elem 
