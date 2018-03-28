@@ -215,9 +215,9 @@ lock_acquire (struct lock *lock)
   /*Add lock to current threads' lock list*/
   thread_update_new_lock(t, lock);
 
-  /*
+
   lock->holder = thread_current ();
-  */
+
 }
 
 /* Tries to acquires LOCK and returns true if successful or false
@@ -251,12 +251,13 @@ lock_release (struct lock *lock)
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
 
+  struct thread *t = thread_current();
   /*Remove lock from current threads' lock list*/
-  
+   
+  thread_delete_new_lock(t,lock);
 
-  /*
   lock->holder = NULL;
-  */
+
 
   sema_up (&lock->semaphore);
 }
