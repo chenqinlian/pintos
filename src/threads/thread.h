@@ -104,6 +104,10 @@ struct thread
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
 
+    //advanced scheduler:
+    int nice;           /* nice value  */
+    int recent_cpu;     /* recent_cpu */
+
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
