@@ -201,6 +201,9 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
+  /* check if new thread's priority is higher than current running thread, task1.2*/
+  thread_check_preemption();
+
   return tid;
 }
 
@@ -338,7 +341,20 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
+  /*
   thread_current ()->priority = new_priority;
+  */
+
+  struct thread *t = thread_current();
+  t->InitialPriority = new_priority;
+
+  if(t->priority > new_priority){
+    t->priority = new_priority;
+    thread_check_preemption();
+  }
+
+
+
 }
 
 /* Returns the current thread's priority. */
@@ -722,7 +738,9 @@ void thread_update_priority_from_locks(struct thread *t){
 
 
 /* check the change of current thread's priority to see if preemption is necessary*/
-void thread_check_preemption(struct thread *t, struct lock *lock){
+void thread_check_preemption(){
+
+  struct thread *t = thread_current();
 
   enum intr_level old_level = intr_disable ();
 
@@ -734,10 +752,7 @@ void thread_check_preemption(struct thread *t, struct lock *lock){
     if(t_max->priority> t_cur->priority){
       thread_yield();
     }
-
-
   }
-
 
   intr_set_level (old_level);  
 }
