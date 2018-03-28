@@ -159,6 +159,12 @@ void check_priority_donation(struct thread *t, struct lock *lock);
 /* update thread attributes when a thread hold a new lock*/
 void thread_update_new_lock(struct thread *t, struct lock *lock);
 
+/* update thread attributes when a thread delete a lock*/
+void thread_delete_new_lock(struct thread *t, struct lock *lock);
+
+/*update thread priority if there is change in lock list*/
+void thread_update_priority_from_locks(struct thread *t);
+
 /* check the change of current thread's priority to see if preemption is necessary*/
 void thread_check_preemption(struct thread *t, struct lock *lock);
 
