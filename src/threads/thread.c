@@ -348,7 +348,7 @@ thread_set_priority (int new_priority)
   struct thread *t = thread_current();
   t->InitialPriority = new_priority;
 
-  if(t->priority > new_priority){
+  if(t->priority > new_priority && list_empty(&t->locks)){
     t->priority = new_priority;
     thread_check_preemption();
   }
@@ -730,6 +730,8 @@ void thread_update_priority_from_locks(struct thread *t){
 
         t->priority = new> old ? new:old;
     }
+    
+    thread_check_preemption();
 
 
 }
