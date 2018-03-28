@@ -198,28 +198,23 @@ lock_init (struct lock *lock)
 void
 lock_acquire (struct lock *lock)
 {
+
   ASSERT (lock != NULL);
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
 
+  struct thread *t = thread_current ();
 
-  struct thread *t = thread_current();
-
-  /*update priority of both lock waiting on/ his holder if possible*/
   check_priority_donation(t, lock);
 
 
   sema_down (&lock->semaphore);
 
 
-  t = thread_current();
+  t = thread_current ();
 
-  lock->holder = t;
-  lock->MaxPriority = t->priority;
-  t->LockWaitOn = NULL;
+  thread_update_new_lock (t,lock);
 
-  /*Add lock to current threads' lock list*/
-  thread_update_new_lock(t, lock);
 
 
 }

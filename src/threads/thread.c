@@ -616,79 +616,61 @@ uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 void check_priority_donation(struct thread *t, struct lock *lock){
 
 
+
   enum intr_level old_level = intr_disable ();
 
+ 
   int Depth = 0;
+
   struct lock *l_temp;
-  struct thread *t_temp;
   struct thread *l_holder; 
 
 
-  if(!lock->holder){
+  if (lock->holder != NULL)
+    {
+      t->LockWaitOn = lock;
 
 
-    t->LockWaitOn = lock;
-
-    l_temp = lock;
-    t_temp = t;
-    l_holder = lock->holder;
+      l_temp = lock;
 
 
+      while (l_temp && Depth< PRI_DONATION_MAX_DEPTH  && t->priority > l_temp->MaxPriority )
+        {
+          l_temp->MaxPriority = t->priority;
+          
+          /*l_temp send the priority given(last step) to his holder, holder thread choose the best guy from his lock list, then update holder's priority*/
 
-    while(!l_temp && Depth<PRI_DONATION_MAX_DEPTH && l_temp->MaxPriority < t_temp->priority ){
-
-      /*current thread t_temp donate priority to l_temp, the lock he is waiting on*/
-        
-      l_temp->MaxPriority = t_temp->priority;
-
-
-      /*l_temp send the priority given(last step) to his holder, holder thread choose the best guy from his lock list, then update holder's priority*/
-
-       thread_update_priority_from_locks(l_holder);
+          thread_update_priority_from_locks(l_temp->holder);
+          thread_check_preemption();
 
 
-      /*update holder's priority in ready list from scheduler, check whether preemption is necessary*/
+          l_holder = l_temp->holder;
+          l_temp = l_holder->LockWaitOn;
 
-      if(l_holder->status = THREAD_READY){
-        list_remove (&l_holder->elem);
-        list_insert_ordered (&ready_list, &l_holder->elem,thread_priority_comparator, NULL);
-      }    
+          Depth++;          
 
-    
-      /*recursive formula*/
-      t_temp = l_holder;
-      l_temp = l_holder->LockWaitOn;
-      l_holder=l_temp->holder;
-
-
-    Depth++;	
-  }
-
-
-
-
-  }
+        }
+    }
 
   intr_set_level (old_level);
 
 }
 
 
-/* update thread attributes when a thread hold a new lock*/
+/* update thread->locks and t<=>lock relation when a thread hold a new lock*/
 void thread_update_new_lock(struct thread *t, struct lock *lock){
-
-  /*This functionn need rename later. lock priority is updated first. lock is added to t->locks later*/
 
   enum intr_level old_level = intr_disable ();
 
   /*lock is added to t->locks*/
   list_insert_ordered(&t->locks, &lock->elem, lock_priority_comparator, NULL);
-  //t->LockWaitOn = NULL;
+  t->LockWaitOn = NULL;
+  lock->holder = t;
 
-
-  /*lock priority is updated*/
+  /*thread priority is updated*/
   thread_update_priority_from_locks(t);
-  
+  thread_check_preemption ();
+
 
 
   intr_set_level (old_level);
@@ -710,7 +692,6 @@ void thread_delete_new_lock(struct thread *t, struct lock *lock){
   thread_update_priority_from_locks(t);
 
 
-
   intr_set_level (old_level);
 
 }
@@ -722,18 +703,14 @@ void thread_update_priority_from_locks(struct thread *t){
 
     if(!list_empty(&t->locks)){
 
-
-        struct lock *locklist_max = list_entry(list_max (&t->locks, lock_priority_comparator, NULL),struct thread, elem);
-    
+        list_sort (&t->locks, lock_priority_comparator, NULL);
+        struct lock *locklist_max = list_entry (list_front (&t->locks),
+                                  struct lock, elem); 
         int old = t->priority;
         int new = locklist_max->MaxPriority;
 
         t->priority = new> old ? new:old;
     }
-    
-    thread_check_preemption();
-
-
 }
 
 
@@ -758,6 +735,7 @@ void thread_check_preemption(){
 
   intr_set_level (old_level);  
 }
+
 
 
 
