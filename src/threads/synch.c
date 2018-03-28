@@ -214,11 +214,13 @@ lock_acquire (struct lock *lock)
 
   t = thread_current();
 
+  lock->holder = t;
+  lock->MaxPriority = t->priority;
+  t->LockWaitOn = NULL;
+
   /*Add lock to current threads' lock list*/
   thread_update_new_lock(t, lock);
 
-
-  lock->holder = thread_current ();
 
 }
 
