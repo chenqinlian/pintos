@@ -255,7 +255,6 @@ lock_release (struct lock *lock)
   /*Remove lock from current threads' lock list*/
    
   thread_delete_new_lock(t,lock);
-
   lock->holder = NULL;
 
 
