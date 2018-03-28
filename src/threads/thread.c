@@ -669,6 +669,7 @@ void thread_update_new_lock(struct thread *t, struct lock *lock){
   list_insert_ordered(&t->locks, &lock->elem, lock_priority_comparator, NULL);
   t->LockWaitOn = NULL;
 
+
   /*lock priority is updated*/
   thread_update_priority_from_locks(t);
   
@@ -687,7 +688,6 @@ void thread_delete_new_lock(struct thread *t, struct lock *lock){
 
   /*lock is deleted from t->locks*/
   list_remove(&lock->elem);
-  lock->holder = NULL;
 
 
   /*thread priority is updated*/
