@@ -665,18 +665,61 @@ void thread_update_new_lock(struct thread *t, struct lock *lock){
 
   enum intr_level old_level = intr_disable ();
 
-  /*lock priority is updated*/
-  lock->holder = t;
-  lock->MaxPriority = t->priority;
-  
-  t->LockWaitOn = NULL;
-
   /*lock is added to t->locks*/
   list_insert_ordered(&t->locks, &lock->elem, lock_priority_comparator, NULL);
+  t->LockWaitOn = NULL;
+
+  /*lock priority is updated*/
+  thread_update_priority_from_locks(t);
+  
+
 
   intr_set_level (old_level);
 
 }
+
+/* update thread attributes when a thread release a new lock*/
+void thread_delete_new_lock(struct thread *t, struct lock *lock){
+
+  /*This functionn need rename later. lock is deleted from t->locks first. lock priority is updated later. */
+
+  enum intr_level old_level = intr_disable ();
+
+  /*lock is deleted from t->locks*/
+  list_remove(&lock->elem);
+  lock->holder = NULL;
+
+
+  /*thread priority is updated*/
+  thread_update_priority_from_locks(t);
+
+
+
+  intr_set_level (old_level);
+
+}
+
+/*update thread priority if there is change in lock list*/
+void thread_update_priority_from_locks(struct thread *t){
+
+    t->priority = t->InitialPriority;
+
+    if(!list_empty(&t->locks)){
+
+
+        struct lock *locklist_max = list_entry(list_max (&t->locks, lock_priority_comparator, NULL),struct thread, elem);
+    
+        int old = t->priority;
+        int new = locklist_max->MaxPriority;
+
+        t->priority = new> old ? new:old;
+    }
+
+
+}
+
+
+
 
 /* check the change of current thread's priority to see if preemption is necessary*/
 void thread_check_preemption(struct thread *t, struct lock *lock){
