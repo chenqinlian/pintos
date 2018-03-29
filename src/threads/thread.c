@@ -830,10 +830,6 @@ thread_mlfqs_update_load_avg_and_recent_cpu (void)
   ASSERT (thread_mlfqs);
   ASSERT (intr_context ());
 
-  size_t ready_threads = list_size (&ready_list);
-  if (thread_current () != idle_thread)
-    ready_threads++;
-  load_avg = ADD (DIV_INT (MUL_INT (load_avg, 59), 60), DIV_INT (FP_CONST (ready_threads), 60));
 
   struct thread *t;
   struct list_elem *e = list_begin (&all_list);
@@ -846,5 +842,34 @@ thread_mlfqs_update_load_avg_and_recent_cpu (void)
       thread_update_priority_each(t);
     }
   }
+}
+
+/* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
+void thread_update_recent_cpu_each(struct thread *t, void *aux){
+
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
+
+    t->recent_cpu = ADD_INT (MUL (DIV (MUL_INT (load_avg, 2), ADD_INT (MUL_INT (load_avg, 2), 1)), t->recent_cpu), t->nice);
+
+    
+
+}
+
+
+/* Every second, load_avg is recalculated*/
+void scheduler_update_load_avg(){
+
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
+
+    //ready_threads, number of threads in ready_list
+
+    size_t ready_threads = list_size (&ready_list);
+    if (thread_current () != idle_thread){
+      ready_threads++;
+    }
+
+    load_avg = ADD (DIV_INT (MUL_INT (load_avg, 59), 60), DIV_INT (FP_CONST (ready_threads), 60));     
 }
 
