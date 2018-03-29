@@ -176,16 +176,12 @@ bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_
 /* Comparator of two threads' priority when being ordered in a list*/
 bool thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
 
-/* Every timer tick, recent_cpu is incremented by 1 for the running thread */
-void thread_update_recent_cpu();
 
-/* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
-void thread_update_priority_each(struct thread *t);
 
-/* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
-void thread_update_recent_cpu_each(struct thread *t, void *aux);
 
-/* Every second, load_avg is recalculated*/
-void scheduler_update_load_avg();
+void thread_mlfqs_update_load_avg_and_recent_cpu (void);
+void thread_mlfqs_update_priority (struct thread *t);
+void thread_mlfqs_increase_recent_cpu_by_one (void);
+
 
 #endif /* threads/thread.h */
