@@ -11,6 +11,7 @@
 #include "threads/switch.h"
 #include "threads/synch.h"
 #include "threads/vaddr.h"
+#include "threads/fixed-point.h"
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
@@ -19,6 +20,10 @@
    Used to detect stack overflow.  See the big comment at the top
    of thread.h for details. */
 #define THREAD_MAGIC 0xcd6abf4b
+
+/* Load Avg for Task1.3 */
+fixed_t load_avg;
+
 
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
@@ -758,4 +763,40 @@ thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e
 
   return t1->priority> t2->priority;
 }
+
+/* Every timer tick, recent_cpu is incremented by 1 for the running thread */
+void thread_update_recent_cpu(){
+    
+    struct thread *t = thread_current();
+
+    //t->recent_cpu add by one
+    t->recent_cpu=0;   //need rewriting
+
+};
+
+/* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
+void thread_update_priority_each(struct thread *t){
+
+    //t->priority = ...
+    t->priority = 0;   //need rewriting
+
+}
+
+
+/* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
+void thread_update_recent_cpu_each(struct thread *t){
+
+    //t->recent_cpu = ...
+    t->recent_cpu = 0; //need rewriting
+
+}
+
+
+/* Every second, load_avg is recalculated*/
+void scheduler_update_load_avg(){
+
+    //load_avg = ...
+    load_avg = 0;      //need rewriting
+}
+
 

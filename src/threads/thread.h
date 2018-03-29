@@ -5,6 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "synch.h"
+#include "threads/fixed-point.h"
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -104,9 +105,9 @@ struct thread
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
 
-    //advanced scheduler:
-    int nice;           /* nice value  */
-    int recent_cpu;     /* recent_cpu */
+    /*  advanced scheduler  */
+    int nice;                           /* Task1.3,  nice value   */
+    fixed_t recent_cpu;                 /* Task1.3,  recent_cpu  */
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
@@ -174,5 +175,17 @@ bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_
 
 /* Comparator of two threads' priority when being ordered in a list*/
 bool thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
+
+/* Every timer tick, recent_cpu is incremented by 1 for the running thread */
+void thread_update_recent_cpu();
+
+/* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
+void thread_update_priority_each(struct thread *t);
+
+/* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
+void thread_update_recent_cpu_each(struct thread *t);
+
+/* Every second, load_avg is recalculated*/
+void scheduler_update_load_avg();
 
 #endif /* threads/thread.h */
