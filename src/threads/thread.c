@@ -116,7 +116,7 @@ thread_start (void)
   thread_create ("idle", PRI_MIN, idle, &idle_started);
 
   /* Set load_avg for task 1.3*/
-  load_avg = FP_CONST(0);
+  load_avg = CONVERT_TO_FIXED_POINT(0);
 
   /* Start preemptive thread scheduling. */
   intr_enable ();
@@ -498,7 +498,7 @@ init_thread (struct thread *t, const char *name, int priority)
 
   /*Set nice, recent_cpu for task 1.3*/
   t->nice = 0;
-  t->recent_cpu = FP_CONST(0);
+  t->recent_cpu = CONVERT_TO_FIXED_POINT(0);
 
 
   old_level = intr_disable ();
@@ -808,7 +808,7 @@ thread_update_priority_each(struct thread *t){
     if(t!=idle_thread){
 
       //t->priority = PRIMAX- (recent_CPU/4) - (nice*2)
-      t->priority = CONVERT_TO_INTEGER_ZERO (SUB_INT (SUB (FP_CONST (PRI_MAX), DIV_INT (t->recent_cpu, 4)), 2 * t->nice));
+      t->priority = CONVERT_TO_INTEGER_ZERO (SUB_INT (SUB (CONVERT_TO_FIXED_POINT (PRI_MAX), DIV_INT (t->recent_cpu, 4)), 2 * t->nice));
       
       //check t->priority overflow
       
@@ -849,6 +849,6 @@ void scheduler_update_load_avg(){
       ready_threads++;
     }
 
-    load_avg = ADD (DIV_INT (MUL_INT (load_avg, 59), 60), DIV_INT (FP_CONST (ready_threads), 60));     
+    load_avg = ADD (DIV_INT (MUL_INT (load_avg, 59), 60), DIV_INT (CONVERT_TO_FIXED_POINT (ready_threads), 60));     
 }
 

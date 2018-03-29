@@ -1,4 +1,11 @@
+/* Fixed-Point Real Arithmetic
+The fundamental idea is to treat the rightmost bits of an integer as representing a fraction.
+For example, we can designate the lowest 14 bits of a signed 32-bit integer as fractional bits,
+so that an integer x represents the real number x/(2**14), where ** represents exponentiation.
+This is called a 17.14 fixed-point number representation,
+because there are 17 bits before the decimal point, 14 bits after it, and one sign bit.
 
+ */
 
 typedef int fixed_t;
 
@@ -10,47 +17,39 @@ typedef int fixed_t;
 #define REAL_MAX ((1 << 31) - 1)
 
 
-/* Get integer part of a fixed-point value. */
-#define CONVERT_TO_FIXED_POINT(n)       n * F
+/* Convert a value to fixed-point value. */
+#define CONVERT_TO_FIXED_POINT(n) 	((fixed_t)(n *F))
 
 /* Get integer part of a fixed-point value. */
-#define CONVERT_TO_INTEGER_ZERO(x) (x / F)
+#define CONVERT_TO_INTEGER_ZERO(x) 	(x / F)
 
 /* Get rounded integer of a fixed-point value. */
-#define CONVERT_TO_INTEGER_NEAREST(x) (x >= 0 ? ((x + (F/2)) /F) : ((x - (F/2)) /F))
+#define CONVERT_TO_INTEGER_NEAREST(x) 	(x >= 0 ? ((x + (F/2)) /F) : ((x - (F/2)) /F))
 
 
+/* Add         within two fixed-point value. */
+#define ADD(x,y) 			(x + y)
 
-/* 16 LSB used for fractional part. */
-#define FP_SHIFT_AMOUNT 16
+/* Subtraction within two fixed-point value. */
+#define SUB(x,y) 			(x - y)
 
-/* Some helpful macros. */
-/* Convert a value to fixed-point value. */
-#define FP_CONST(n) ((fixed_t)(n *F))
+/* Add int x  to fixed-point n. */
+#define ADD_INT(x,n) 			(x + (n * F))
 
-/* Add two fixed-point value. */
-#define ADD(x,y) (x + y)
+/* Subtract int x  by fixed-point n. */
+#define SUB_INT(x,n) 			(x - (n * F))
 
-/* Add a fixed-point value A and an int value B. */
-#define ADD_INT(x,n) (x + (n * F))
+/* Multiply    within two fixed-point value */
+#define MUL(x,y) 			((fixed_t)(((int64_t) x) * y / F))
 
-/* Substract two fixed-point value. */
-#define SUB(x,y) (x - y)
+/* Multiply    fixed-point x with int n */
+#define MUL_INT(x,n) 			(x * n)
 
-/* Substract an int value B from a fixed-point value A */
-#define SUB_INT(x,n) (x - (n * F))
+/* Division    within two fixed-point value. */
+#define DIV(x,y) 			((fixed_t)((((int64_t) x) * F) / y))
 
-/* Multiply a fixed-point value A by an int value B. */
-#define MUL_INT(x,n) (x * n)
-
-/* Divide a fixed-point value A by an int value B. */
-#define DIV_INT(x,n) (x / n)
-
-/* Multiply two fixed-point value. */
-#define MUL(x,y) ((fixed_t)(((int64_t) x) * y / F))
-
-/* Divide two fixed-point value. */
-#define DIV(x,y) ((fixed_t)((((int64_t) x) * F) / y))
+/* Divide     fixed-point x  by int n */
+#define DIV_INT(x,n) 			(x / n)
 
 
 
