@@ -10,10 +10,17 @@ typedef int fixed_t;
 #define F (1 << Q)
 #define REAL_MAX ((1 << 31) - 1)
 
-
+/* Convert n to fixed point*/
 #define CONVERT_TO_FIXED_POINT(n)       n * F
-#define CONVERT_TO_INTEGER_ZERO(x)      x / f
+
+/* Convert x to integer (rounding toward zero) */
+#define CONVERT_TO_INTEGER_ZERO(x)      x / F
+
+/* Convert x to integer (rounding to nearest) */
 #define CONVERT_TO_INTEGER_NEAREST(x)   x >= 0 ? (x + F/2)/F : (x - F/2)/F
+
+
+
 
 /* Add         within two fixed-point value. */
 #define ADD(x, y)             x + y

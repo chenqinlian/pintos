@@ -772,18 +772,46 @@ thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e
 /* Every timer tick, recent_cpu is incremented by 1 for the running thread */
 void thread_update_recent_cpu(){
     
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
+
+
     struct thread *t = thread_current();
 
-    //t->recent_cpu add by one
-    t->recent_cpu=0;   //need rewriting
+    if(t->status== THREAD_RUNNING){
+
+      //t->recent_cpu add by one
+      t->recent_cpu = ADD_INT(t->recent_cpu, 1); 
+    }
+
 
 };
 
 /* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
 void thread_update_priority_each(struct thread *t){
 
-    //t->priority = ...
-    t->priority = 0;   //need rewriting
+    ASSERT (thread_mlfqs);
+    
+    if(t!=idle_thread){
+
+      //t->priority = PRIMAX- (recent_CPU/4) - (nice*2)
+
+      fixed_t temp = DIV_INT(t->recent_cpu,4);  // temp = recent_cpu/4
+
+      t->priority = CONVERT_TO_INTEGER_ZERO(SUB_INT(SUB_INT(PRI_MAX, temp)
+					    , 2*t->nice));   //??? PRIMAX => CONVERT_TO_FIXED_POINT(PRIMAX)?
+
+      
+      //check t->priority overflow
+      
+      if(t->priority> PRI_MAX){
+          t->priority = PRI_MAX;
+      }
+      if(t->priority< PRI_MIN){
+          t->priority = PRI_MIN;
+      }
+
+    }
 
 }
 
@@ -791,8 +819,21 @@ void thread_update_priority_each(struct thread *t){
 /* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
 void thread_update_recent_cpu_each(struct thread *t){
 
-    //t->recent_cpu = ...
-    t->recent_cpu = 0; //need rewriting
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
+
+    //should update load_avg first
+
+    //t->recent_cpu = ( 2*load_avg )/( 2*load_avg + 1)*recent_cpu + nice
+
+    fixed_t temp1 = MUL_INT(load_avg,2);           //temp1 = 2*load_avg
+ 
+    fixed_t temp2 = DIV( temp1, ADD_INT(temp1,1)); //temp2 = ( 2*load_avg )/( 2*load_avg + 1)
+
+    fixed_t temp3 = MUL(temp2, t->recent_cpu);     //temp3 = ( 2*load_avg )/( 2*load_avg + 1)*recent_cpu
+
+    t->recent_cpu = ADD_INT(t->nice, temp3);       //recent_cpu = temp3+nice
+    
 
 }
 
@@ -800,8 +841,20 @@ void thread_update_recent_cpu_each(struct thread *t){
 /* Every second, load_avg is recalculated*/
 void scheduler_update_load_avg(){
 
-    //load_avg = ...
-    load_avg = 0;      //need rewriting
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
+
+    //ready_threads, number of threads in ready_list
+    fixed_t ready_threads = CONVERT_TO_FIXED_POINT(list_size (&ready_list)); 
+
+
+    //load_avg = (59/60)*load_avg + (1/60)* ready_threads
+
+    fixed_t temp1 =  DIV_INT( MUL_INT(load_avg, 59), 60);   //temp1 = (59/60)*load_avg 
+    fixed_t temp2 =  DIV_INT( ready_threads, 60);           //temp2 = (1/60)* ready_threads
+
+    load_avg = ADD(temp1, temp2);      
+
 }
 
 
