@@ -379,8 +379,6 @@ thread_set_nice (int nice UNUSED)
 
     thread_current ()->nice = nice;
     thread_update_priority_each(thread_current ());
-    thread_yield ();
- 
 
 }
 
