@@ -183,7 +183,6 @@ void thread_update_recent_cpu();
 /* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
 void thread_update_priority_each(struct thread *t);
 
-
 /* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
 void thread_update_recent_cpu_each(struct thread *t, void *aux);
 

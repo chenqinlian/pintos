@@ -229,7 +229,6 @@ timer_interrupt (struct intr_frame *args UNUSED)
       // Prioriy is recalculated for each thread
       //thread_foreach(thread_update_priority_each, NULL);      
 
-
       thread_update_priority_each(thread_current ());
     }
   }

@@ -26,25 +26,25 @@ typedef int fixed_t;
 
 /* Some helpful macros. */
 /* Convert a value to fixed-point value. */
-#define FP_CONST(x) ((fixed_t)(x *F))
+#define FP_CONST(n) ((fixed_t)(n *F))
 
 /* Add two fixed-point value. */
 #define ADD(x,y) (x + y)
 
 /* Add a fixed-point value A and an int value B. */
-#define ADD_INT(x,y) (x + (y * F))
+#define ADD_INT(x,n) (x + (n * F))
 
 /* Substract two fixed-point value. */
 #define SUB(x,y) (x - y)
 
 /* Substract an int value B from a fixed-point value A */
-#define SUB_INT(x,y) (x - (y * F))
+#define SUB_INT(x,n) (x - (n * F))
 
 /* Multiply a fixed-point value A by an int value B. */
-#define MUL_INT(x,y) (x * y)
+#define MUL_INT(x,n) (x * n)
 
 /* Divide a fixed-point value A by an int value B. */
-#define DIV_INT(x,y) (x / y)
+#define DIV_INT(x,n) (x / n)
 
 /* Multiply two fixed-point value. */
 #define MUL(x,y) ((fixed_t)(((int64_t) x) * y / F))
