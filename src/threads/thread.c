@@ -778,19 +778,23 @@ thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e
 }
 
 
-/* Increase recent_cpu by 1. */
-void
-thread_mlfqs_increase_recent_cpu_by_one (void)
-{
-  ASSERT (thread_mlfqs);
-  ASSERT (intr_context ());
+/* Every timer tick, recent_cpu is incremented by 1 for the running thread */
+void thread_update_recent_cpu(){
+    
+    ASSERT (thread_mlfqs);
+    ASSERT (intr_context ());
 
-  struct thread *current_thread = thread_current ();
-  if (current_thread == idle_thread)
-    return;
-  current_thread->recent_cpu = ADD_INT (current_thread->recent_cpu, 1);
-}
 
+    struct thread *t = thread_current();
+
+    if(t->status== THREAD_RUNNING){
+
+      //t->recent_cpu add by one
+      t->recent_cpu = ADD_INT(t->recent_cpu, 1); 
+    }
+
+
+};
 
 
 

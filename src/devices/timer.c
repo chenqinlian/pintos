@@ -210,9 +210,8 @@ timer_interrupt (struct intr_frame *args UNUSED)
   if (thread_mlfqs){ // Every timer tick
   
     //recent cpu is incremented by one
-    //thread_update_recent_cpu();
+    thread_update_recent_cpu();
 
-    thread_mlfqs_increase_recent_cpu_by_one ();
 
     if(ticks%TIMER_FREQ ==0){ // Every second
 

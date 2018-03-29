@@ -177,11 +177,12 @@ bool thread_wakeuptime_comparator(const struct list_elem *e1, const struct list_
 bool thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e2, void *aux);
 
 
+/* Every timer tick, recent_cpu is incremented by 1 for the running thread */
+void thread_update_recent_cpu();
 
 
 void thread_mlfqs_update_load_avg_and_recent_cpu (void);
 void thread_mlfqs_update_priority (struct thread *t);
-void thread_mlfqs_increase_recent_cpu_by_one (void);
 
 
 #endif /* threads/thread.h */
