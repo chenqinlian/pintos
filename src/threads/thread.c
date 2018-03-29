@@ -854,13 +854,18 @@ void scheduler_update_load_avg(){
     ASSERT (intr_context ());
 
     //ready_threads, number of threads in ready_list
-    fixed_t ready_threads = CONVERT_TO_FIXED_POINT(list_size (&ready_list)); 
 
+    int ready_threads = list_size (&ready_list); 
+
+
+    if (thread_current () != idle_thread){
+        ready_threads++;
+    }
 
     //load_avg = (59/60)*load_avg + (1/60)* ready_threads
 
     fixed_t temp1 =  DIV_INT( MUL_INT(load_avg, 59), 60);   //temp1 = (59/60)*load_avg 
-    fixed_t temp2 =  DIV_INT( ready_threads, 60);           //temp2 = (1/60)* ready_threads
+    fixed_t temp2 =  DIV_INT( CONVERT_TO_FIXED_POINT(ready_threads), 60);           //temp2 = (1/60)* ready_threads
 
     load_avg = ADD(temp1, temp2);      
 
