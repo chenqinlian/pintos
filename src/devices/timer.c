@@ -232,7 +232,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       //thread_foreach(thread_update_priority_each, NULL);      
 
 
-      thread_mlfqs_update_priority (thread_current ());
+      thread_update_priority_each(thread_current ());
     }
   }
 

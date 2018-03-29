@@ -180,9 +180,11 @@ bool thread_priority_comparator(const struct list_elem *e1, const struct list_el
 /* Every timer tick, recent_cpu is incremented by 1 for the running thread */
 void thread_update_recent_cpu();
 
+/* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
+void thread_update_priority_each(struct thread *t);
+
 
 void thread_mlfqs_update_load_avg_and_recent_cpu (void);
-void thread_mlfqs_update_priority (struct thread *t);
 
 
 #endif /* threads/thread.h */

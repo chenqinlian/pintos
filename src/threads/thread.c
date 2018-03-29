@@ -378,7 +378,7 @@ thread_set_nice (int nice UNUSED)
 {
 
     thread_current ()->nice = nice;
-    thread_mlfqs_update_priority (thread_current ());
+    thread_update_priority_each(thread_current ());
     thread_yield ();
  
 
@@ -798,19 +798,29 @@ void thread_update_recent_cpu(){
 
 
 
-/* Update priority. */
+/* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
+
 void
-thread_mlfqs_update_priority (struct thread *t)
-{
-  if (t == idle_thread)
-    return;
+thread_update_priority_each(struct thread *t){
 
-  ASSERT (thread_mlfqs);
-  ASSERT (t != idle_thread);
+    ASSERT (thread_mlfqs);
+    
+    if(t!=idle_thread){
 
-  t->priority = CONVERT_TO_INTEGER_ZERO (SUB_INT (SUB (FP_CONST (PRI_MAX), DIV_INT (t->recent_cpu, 4)), 2 * t->nice));
-  t->priority = t->priority < PRI_MIN ? PRI_MIN : t->priority;
-  t->priority = t->priority > PRI_MAX ? PRI_MAX : t->priority;
+      //t->priority = PRIMAX- (recent_CPU/4) - (nice*2)
+      t->priority = CONVERT_TO_INTEGER_ZERO (SUB_INT (SUB (FP_CONST (PRI_MAX), DIV_INT (t->recent_cpu, 4)), 2 * t->nice));
+      
+      //check t->priority overflow
+      
+      if(t->priority> PRI_MAX){
+          t->priority = PRI_MAX;
+      }
+      if(t->priority< PRI_MIN){
+          t->priority = PRI_MIN;
+      }
+
+    }
+
 }
 
 /* Every per second to refresh load_avg and recent_cpu of all threads. */
@@ -833,7 +843,7 @@ thread_mlfqs_update_load_avg_and_recent_cpu (void)
     if (t != idle_thread)
     {
       t->recent_cpu = ADD_INT (MUL (DIV (MUL_INT (load_avg, 2), ADD_INT (MUL_INT (load_avg, 2), 1)), t->recent_cpu), t->nice);
-      thread_mlfqs_update_priority (t);
+      thread_update_priority_each(t);
     }
   }
 }
