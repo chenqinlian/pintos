@@ -376,8 +376,9 @@ thread_set_nice (int nice UNUSED)
 
   thread_current()->nice = nice;
   
-  //Need fix, use foreach, thread_update_priority_each to update each thread's priority
-  //!!
+  thread_update_priority_each(thread_current());
+   
+  thread_yield(); //??
 
 }
 
