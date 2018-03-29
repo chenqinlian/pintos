@@ -212,21 +212,24 @@ timer_interrupt (struct intr_frame *args UNUSED)
     //recent cpu is incremented by one
     thread_update_recent_cpu();
 
+
     if(ticks%TIMER_FREQ ==0){ // Every second
 
       // load_avg is recalculated
       // recent cpu is recalculated for each thread
 
+
       scheduler_update_load_avg();
       thread_foreach(thread_update_recent_cpu_each, NULL);
-
+      thread_foreach(thread_update_priority_each, NULL);
 
     }
     else if( ticks % 4 == 0){ // Every fourth tick
     
       // Prioriy is recalculated for each thread
-      thread_foreach(thread_update_priority_each, NULL);      
+      //thread_foreach(thread_update_priority_each, NULL);      
 
+      thread_update_priority_each(thread_current ());
     }
   }
 

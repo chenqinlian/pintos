@@ -377,11 +377,10 @@ void
 thread_set_nice (int nice UNUSED) 
 {
 
-  thread_current()->nice = nice;
-  
-  thread_update_priority_each(thread_current());
-   
-  thread_yield(); //thread_check_preemption?
+    thread_current ()->nice = nice;
+    thread_update_priority_each(thread_current ());
+    thread_yield ();
+ 
 
 }
 
@@ -398,7 +397,7 @@ int
 thread_get_load_avg (void) 
 {
 
-  return CONVERT_TO_INTEGER_NEAREST(MUL_INT(load_avg,100));
+  return CONVERT_TO_INTEGER_NEAREST (MUL_INT (load_avg, 100));
 }
 
 /* Returns 100 times the current thread's recent_cpu value. */
@@ -406,7 +405,7 @@ int
 thread_get_recent_cpu (void) 
 {
 
-  return CONVERT_TO_INTEGER_NEAREST(MUL_INT(thread_current()->recent_cpu,100));
+  return CONVERT_TO_INTEGER_NEAREST (MUL_INT (thread_current ()->recent_cpu, 100));
 }
 
 /* Idle thread.  Executes when no other thread is ready to run.
@@ -778,6 +777,7 @@ thread_priority_comparator(const struct list_elem *e1, const struct list_elem *e
   return t1->priority> t2->priority;
 }
 
+
 /* Every timer tick, recent_cpu is incremented by 1 for the running thread */
 void thread_update_recent_cpu(){
     
@@ -796,20 +796,19 @@ void thread_update_recent_cpu(){
 
 };
 
+
+
 /* Every 4th tick, Priority is recalculated for each thread. Need foreach this function when excuting */
-void thread_update_priority_each(struct thread *t){
+
+void
+thread_update_priority_each(struct thread *t){
 
     ASSERT (thread_mlfqs);
     
     if(t!=idle_thread){
 
       //t->priority = PRIMAX- (recent_CPU/4) - (nice*2)
-
-      fixed_t temp = DIV_INT(t->recent_cpu,4);  // temp = recent_cpu/4
-
-      t->priority = CONVERT_TO_INTEGER_ZERO(SUB_INT(SUB_INT(PRI_MAX, temp)
-					    , 2*t->nice));   //??? PRIMAX => CONVERT_TO_FIXED_POINT(PRIMAX)?
-
+      t->priority = CONVERT_TO_INTEGER_ZERO (SUB_INT (SUB (CONVERT_TO_FIXED_POINT (PRI_MAX), DIV_INT (t->recent_cpu, 4)), 2 * t->nice));
       
       //check t->priority overflow
       
@@ -831,18 +830,8 @@ void thread_update_recent_cpu_each(struct thread *t, void *aux){
     ASSERT (thread_mlfqs);
     ASSERT (intr_context ());
 
-    //should update load_avg first
+    t->recent_cpu = ADD_INT (MUL (DIV (MUL_INT (load_avg, 2), ADD_INT (MUL_INT (load_avg, 2), 1)), t->recent_cpu), t->nice);
 
-    //t->recent_cpu = ( 2*load_avg )/( 2*load_avg + 1)*recent_cpu + nice
-
-    fixed_t temp1 = MUL_INT(load_avg,2);           //temp1 = 2*load_avg
- 
-    fixed_t temp2 = DIV( temp1, ADD_INT(temp1,1)); //temp2 = ( 2*load_avg )/( 2*load_avg + 1)
-
-    fixed_t temp3 = MUL(temp2, t->recent_cpu);     //temp3 = ( 2*load_avg )/( 2*load_avg + 1)*recent_cpu
-
-    t->recent_cpu = ADD_INT(t->nice, temp3);       //recent_cpu = temp3+nice
-    
 
 }
 
@@ -855,20 +844,11 @@ void scheduler_update_load_avg(){
 
     //ready_threads, number of threads in ready_list
 
-    int ready_threads = list_size (&ready_list); 
-
-
+    size_t ready_threads = list_size (&ready_list);
     if (thread_current () != idle_thread){
-        ready_threads++;
+      ready_threads++;
     }
 
-    //load_avg = (59/60)*load_avg + (1/60)* ready_threads
-
-    fixed_t temp1 =  DIV_INT( MUL_INT(load_avg, 59), 60);   //temp1 = (59/60)*load_avg 
-    fixed_t temp2 =  DIV_INT( CONVERT_TO_FIXED_POINT(ready_threads), 60);           //temp2 = (1/60)* ready_threads
-
-    load_avg = ADD(temp1, temp2);      
-
+    load_avg = ADD (DIV_INT (MUL_INT (load_avg, 59), 60), DIV_INT (CONVERT_TO_FIXED_POINT (ready_threads), 60));     
 }
-
 
