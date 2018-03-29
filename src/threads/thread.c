@@ -823,26 +823,6 @@ thread_update_priority_each(struct thread *t){
 
 }
 
-/* Every per second to refresh load_avg and recent_cpu of all threads. */
-void
-thread_mlfqs_update_load_avg_and_recent_cpu (void)
-{
-  ASSERT (thread_mlfqs);
-  ASSERT (intr_context ());
-
-
-  struct thread *t;
-  struct list_elem *e = list_begin (&all_list);
-  for (; e != list_end (&all_list); e = list_next (e))
-  {
-    t = list_entry(e, struct thread, allelem);
-    if (t != idle_thread)
-    {
-      t->recent_cpu = ADD_INT (MUL (DIV (MUL_INT (load_avg, 2), ADD_INT (MUL_INT (load_avg, 2), 1)), t->recent_cpu), t->nice);
-      thread_update_priority_each(t);
-    }
-  }
-}
 
 /* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
 void thread_update_recent_cpu_each(struct thread *t, void *aux){
@@ -852,7 +832,6 @@ void thread_update_recent_cpu_each(struct thread *t, void *aux){
 
     t->recent_cpu = ADD_INT (MUL (DIV (MUL_INT (load_avg, 2), ADD_INT (MUL_INT (load_avg, 2), 1)), t->recent_cpu), t->nice);
 
-    
 
 }
 

@@ -220,12 +220,8 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
 
       scheduler_update_load_avg();
-      //thread_foreach(thread_update_recent_cpu_each, NULL);
-      //thread_foreach(thread_update_priority_each, NULL);
-
-
-      thread_mlfqs_update_load_avg_and_recent_cpu ();
-
+      thread_foreach(thread_update_recent_cpu_each, NULL);
+      thread_foreach(thread_update_priority_each, NULL);
 
     }
     else if( ticks % 4 == 0){ // Every fourth tick

@@ -184,8 +184,6 @@ void thread_update_recent_cpu();
 void thread_update_priority_each(struct thread *t);
 
 
-void thread_mlfqs_update_load_avg_and_recent_cpu (void);
-
 /* Every second, recent cpu is recalculated for each thread. Need foreach this function when excuting*/
 void thread_update_recent_cpu_each(struct thread *t, void *aux);
 
