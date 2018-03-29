@@ -115,6 +115,9 @@ thread_start (void)
   sema_init (&idle_started, 0);
   thread_create ("idle", PRI_MIN, idle, &idle_started);
 
+  /* Set load_avg for task 1.3*/
+  load_avg = CONVERT_TO_FIXED_POINT(0);
+
   /* Start preemptive thread scheduling. */
   intr_enable ();
 
@@ -378,7 +381,7 @@ thread_set_nice (int nice UNUSED)
   
   thread_update_priority_each(thread_current());
    
-  thread_yield(); //??
+  thread_yield(); //thread_check_preemption?
 
 }
 
@@ -493,6 +496,11 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
+
+  /*Set nice, recent_cpu for task 1.3*/
+  t->nice = 0;
+  t->recent_cpu = CONVERT_TO_FIXED_POINT(0);
+
 
   old_level = intr_disable ();
   list_push_back (&all_list, &t->allelem);
